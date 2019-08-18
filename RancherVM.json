@@ -1,0 +1,191 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "UbuntuVMPIPName": {
+        "type": "string",
+        "defaultValue": "ubuntu-pip",
+        "metadata": {
+          "description": "Name of the Linux VM Public IP"
+        }
+      },
+      "VMName": {
+        "type": "string",
+        "defaultValue": "Rancher-VM",
+        "metadata": {
+          "description": "VM Name"
+        }
+      },
+      "VNetName": {
+        "type": "string",
+        "defaultValue": "rancher-vnet",
+        "metadata": {
+          "description": "Azure Virtual Network Name"
+        }
+      },
+      "VMSubnetName": {
+        "type": "string",
+        "defaultValue": "VM-Subnet",
+        "metadata": {
+          "description": "Subnet for Rancher VM Deployment"
+        }
+      },
+      "AdminUserName": {
+        "type": "string",
+        "metadata": {
+          "description": "User Name for the VM"
+        }
+      },
+      "AdminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Password for Admin Account"
+        }
+      }
+    },
+    "variables": {
+      "VNetAddressPrefix": "10.30.0.0/16",
+      "VNetSubnetPrefix": "10.30.1.0/24",
+      "NICName": "[concat(parameters('VMName'),'-vm-nic')]",
+      "ManagedDiskSKU": "Standard_LRS",
+      "ExtensionName": "DockerExtension"
+    },
+    "resources": [
+      {
+        "apiVersion": "2018-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[parameters('UbuntuVMPIPName')]",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "displayName": "PublicIPAddress"
+        },
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+            "domainNameLabel": "[concat(toLower(parameters('VMName')),uniqueString(resourceGroup().id),0,6)]"
+          }
+        }
+      },
+      {
+        "apiVersion": "2018-08-01",
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[parameters('VNetName')]",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "displayName": "VirtualNetwork"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": ["[variables('VNetAddressPrefix')]"]
+          },
+          "subnets": [
+            {
+              "name": "[parameters('VMSubnetName')]",
+              "properties": {
+                "addressPrefix": "[variables('VNetSubnetPrefix')]"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2018-08-01",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[variables('NICName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/publicIPAddresses/',parameters('UbuntuVMPIPName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/',parameters('VNetName'))]"
+        ],
+        "tags": {
+          "displayName": "[variables('NICName')]"
+        },
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('UbuntuVMPIPName'))]"
+                },
+                "subnet": {
+                  "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('VNetName')), '/subnets/',parameters('VMSubnetName'))]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2018-10-01",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[parameters('VMName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/',variables('NICName'))]"
+        ],
+        "tags": {
+          "displayName": "[parameters('VMName')]"
+        },
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_B2ms"
+          },
+          "osProfile": {
+            "computerName": "[parameters('VMName')]",
+            "adminUsername": "[parameters('AdminUserName')]",
+            "adminPassword": "[parameters('AdminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "UbuntuServer",
+              "sku": "16.04-LTS",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "[concat(parameters('VMName'),'-OSDisk')]",
+              "caching": "ReadWrite",
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "[variables('ManagedDiskSKU')]"
+              }
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('NICName'))]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('VMName'),'/', variables('ExtensionName'))]",
+        "apiVersion": "2017-03-30",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('VMName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "DockerExtension",
+          "typeHandlerVersion": "1.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "compose": {
+              "rancher": {
+                "image": "rancher/rancher:stable",
+                "ports": ["80:80", "443:443"],
+                "volumes": ["/opt/rancher:/var/lib/rancher"]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {}
+  }
