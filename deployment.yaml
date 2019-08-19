@@ -5,7 +5,6 @@ metadata:
     deployment.kubernetes.io/revision: "1"
     field.cattle.io/creatorId: user-pg74v
     field.cattle.io/publicEndpoints: '[{"addresses":["23.97.237.188"],"port":32244,"protocol":"TCP","serviceName":"app:app-nodeport","allNodes":true}]'
-  creationTimestamp: "2019-08-19T09:43:11Z"
   generation: 2
   labels:
     cattle.io/creator: norman
@@ -30,7 +29,6 @@ spec:
   template:
     metadata:
       annotations:
-        cattle.io/timestamp: "2019-08-19T09:43:11Z"
         field.cattle.io/ports: '[[{"containerPort":5000,"dnsName":"app-nodeport","kind":"NodePort","name":"5000tcp01","protocol":"TCP","sourcePort":0}]]'
       creationTimestamp: null
       labels:
@@ -60,22 +58,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2019-08-19T09:43:24Z"
-    lastUpdateTime: "2019-08-19T09:43:24Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2019-08-19T09:43:11Z"
-    lastUpdateTime: "2019-08-19T09:43:24Z"
-    message: ReplicaSet "app-5bfdb8459f" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 2
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
