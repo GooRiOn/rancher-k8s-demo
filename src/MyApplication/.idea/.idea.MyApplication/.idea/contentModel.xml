@@ -3,6 +3,7 @@
   <component name="ContentModelStore">
     <e p="C:\Repositories\rancher-k8s-demo\src\MyApplication" t="IncludeRecursive">
       <e p="appsettings.Development.json" t="Include" />
+      <e p="appsettings.docker.json" t="Include" />
       <e p="appsettings.json" t="Include" />
       <e p="bin" t="ExcludeRecursive" />
       <e p="Controllers" t="Include">

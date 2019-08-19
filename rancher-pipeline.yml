@@ -1,0 +1,15 @@
+﻿stages:
+- name: publish image
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: goorion/myapplication:latest
+      pushRemote: true
+      registry: index.docker.io
+- name: redeploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yaml
+timeout: 60
+notification: {}

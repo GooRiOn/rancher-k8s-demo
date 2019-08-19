@@ -46,6 +46,7 @@ namespace MyApplication
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMongoRepository<MessageDocument, Guid> repo)
         {
             app
+                .UseJaeger()
                 .UseRabbitMq()
                 .Subscribe<Message>(async (sp, message, ctx) =>
                 {
