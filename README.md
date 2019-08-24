@@ -23,6 +23,14 @@ Specify **public/internal address**:
 `--address <Public_IP> --internal-address <Internal_Node_IP>`
 
 
+# Istio
+Run for each namespace to allow sidecars injection:
+
+`kubectl label namespace $your-namesapce istio-injection=enabled`
+
+Istio requires also labels for **app** and **version**
+
+
 # In case of ETCD failure...
 
 ```bash
