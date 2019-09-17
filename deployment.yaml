@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
  name: app
-  namespace: project
+ namespace: project
 spec:
  replicas: 3
  template:
