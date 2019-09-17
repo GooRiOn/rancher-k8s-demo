@@ -23,6 +23,9 @@ namespace MyApplication.Controllers
             _publisher = publisher;
         }
 
+        [HttpGet("ping")]
+        public string Ping() => "Pong";
+
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
