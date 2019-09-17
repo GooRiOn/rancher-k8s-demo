@@ -6,7 +6,7 @@ stages:
       buildContext: .
       tag: goorion/myapplication:latest
       pushRemote: true
-      registry: hub.docker.com
+      registry: index.docker.io
 - name: redeploy
   steps:
   - applyYamlConfig:
