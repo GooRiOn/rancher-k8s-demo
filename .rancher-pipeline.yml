@@ -4,7 +4,7 @@ stages:
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
       buildContext: .
-      tag: goorion/myapplication:k8s
+      tag: goorion/myapplication:latest
       pushRemote: true
       registry: index.docker.io
 - name: redeploy
