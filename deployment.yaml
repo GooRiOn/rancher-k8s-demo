@@ -1,7 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
- name: myapp-dpl
+ name: app
+  namespace: project
 spec:
  replicas: 3
  template:
