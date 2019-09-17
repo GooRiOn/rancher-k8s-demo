@@ -24,7 +24,7 @@ namespace MyApplication.Controllers
         }
 
         [HttpGet("ping")]
-        public string Ping() => "Pong"; m
+        public string Ping() => "Pong"; 
 
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
