@@ -26,7 +26,7 @@ Specify **public/internal address**:
 # Istio
 Run for each namespace to allow sidecars injection:
 
-`kubectl label namespace $your-namesapce istio-injection=enabled`
+`kubectl label namespace <$your-namesapce> istio-injection=enabled`
 
 Istio requires also labels for **app** and **version**
 
