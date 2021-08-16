@@ -8,7 +8,7 @@ Install Docker on Ubuntu VM
 # Rancher
 Instal rancher on master node:
 
-`sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher`
+`sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher`
 
 Install etcd/control plane/worker on slave:
 
